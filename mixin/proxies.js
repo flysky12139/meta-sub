@@ -1,5 +1,6 @@
 class Vmess {
   constructor(params) {
+    this.validateParams(params);
     this.common = {
       name: params.ps,
       type: 'vmess',
@@ -8,24 +9,32 @@ class Vmess {
       uuid: params.id,
       alterId: params.aid,
       cipher: 'auto'
+    };
+  }
+
+  validateParams(params) {
+    const requiredParams = ['ps', 'add', 'port', 'id', 'aid'];
+    for (const param of requiredParams) {
+      if (!params[param]) {
+        throw new Error(`Missing required parameter: ${param}`);
+      }
     }
   }
 }
 
 class VmessWS extends Vmess {
   constructor(params, host) {
-    super(params)
-    this.common = Object.assign({}, this.common, {
+    super(params);
+    this.common = {
+      ...this.common,
       udp: true,
       tls: params.tls === 'tls',
       network: 'ws',
       'ws-opts': {
         path: params.path || '/',
-        headers: {
-          Host: host
-        }
+        headers: { Host: host }
       }
-    })
+    };
   }
 }
 
@@ -49,6 +58,21 @@ class VmessHTTP extends Vmess {
   }
 }
 
+class VmessH2 extends Vmess {
+  constructor(params, host) {
+    super(params);
+    this.common = {
+      ...this.common,
+      network: 'h2',
+      tls: params.tls === 'tls',
+      'h2-opts': {
+        path: params.path || '/',
+        host: [host]
+      }
+    };
+  }
+}
+
 function template(params, host) {
   let result = null
   switch (params.net) {
@@ -57,6 +81,9 @@ function template(params, host) {
       break
     case 'http':
       result = new VmessHTTP(params, host)
+      break
+    case 'h2':
+      result = new VmessH2(params, host)
       break
     default:
       result = new Vmess(params)
