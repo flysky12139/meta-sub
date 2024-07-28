@@ -31,19 +31,21 @@ class VmessWS extends Vmess {
 
 class VmessHTTP extends Vmess {
   constructor(params, host) {
-    super(params)
-    this.common = Object.assign({}, this.common, {
+    super(params);
+    const method = params.method || 'GET'; // Define a default method
+    this.common = {
+      ...this.common,
       udp: true,
       tls: params.tls === 'tls',
       network: 'http',
       'http-opts': {
         path: params.path || '/',
-        method: params.method || 'GET',
         headers: {
-          Host: host
+          Host: host,
+          method: method
         }
       }
-    })
+    };
   }
 }
 
