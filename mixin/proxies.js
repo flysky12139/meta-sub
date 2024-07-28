@@ -35,9 +35,8 @@ class VmessHTTP extends Vmess {
     this.common = Object.assign({}, this.common, {
       udp: true,
       tls: params.tls === 'tls',
-      network: 'tcp',
+      network: 'http',
       'http-opts': {
-        type: params.type || 'http',
         method: params.method || 'GET',
         path: params.path || '/',
         host: [host]
@@ -52,7 +51,7 @@ function template(params, host) {
     case 'ws':
       result = new VmessWS(params, host)
       break
-    case 'tcp':
+    case 'http':
       result = new VmessHTTP(params, host)
       break
     default:
