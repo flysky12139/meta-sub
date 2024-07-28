@@ -29,15 +29,18 @@ class VmessWS extends Vmess {
   }
 }
 
-class VmessH2 extends Vmess {
+class VmessHTTP extends Vmess {
   constructor(params, host) {
     super(params)
     this.common = Object.assign({}, this.common, {
-      network: 'h2',
+      network: 'http',
       tls: params.tls === 'tls',
-      'h2-opts': {
+      'http-opts': {
         path: params.path || '/',
-        host: [host]
+        method: params.path || 'GET',
+        headers: {
+          Host: host
+        }
       }
     })
   }
@@ -49,8 +52,8 @@ function template(params, host) {
     case 'ws':
       result = new VmessWS(params, host)
       break
-    case 'h2':
-      result = new VmessH2(params, host)
+    case 'http':
+      result = new VmessHTTP(params, host)
       break
     default:
       result = new Vmess(params)
