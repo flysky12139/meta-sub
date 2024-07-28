@@ -33,11 +33,12 @@ class VmessHTTP extends Vmess {
   constructor(params, host) {
     super(params)
     this.common = Object.assign({}, this.common, {
-      network: 'http',
+      udp: true,
       tls: params.tls === 'tls',
+      network: 'http',
       'http-opts': {
         path: params.path || '/',
-        method: params.path || 'GET',
+        method: params.method || 'GET',
         headers: {
           Host: host
         }
